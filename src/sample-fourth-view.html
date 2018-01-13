@@ -1,0 +1,227 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-styles/color.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+
+<dom-module id="sample-fourth-view">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+
+      paper-input {
+            max-width: 400px;
+            margin: auto;
+      }
+    iron-icon, div[suffix] {
+        color: hsl(0, 0%, 50%);
+        margin-right: 12px;
+    }
+    paper-dropdown-menu, paper-listbox {
+      width: 250px;
+    }
+    paper-dropdown-menu {
+      height: 200px;
+      margin: auto;
+      display: block;
+    }
+
+    paper-checkbox {
+    font-family: 'Roboto', sans-serif;
+    margin: 24px;
+  }
+    
+  paper-checkbox:first-child {
+    --primary-color: #ff5722;
+  }
+  
+  paper-checkbox.styled {
+    align-self: center;
+    border: 1px solid var(--paper-green-200);
+    padding: 8px 16px;
+    --paper-checkbox-checked-color: var(--paper-green-500);
+    --paper-checkbox-checked-ink-color: var(--paper-green-500);
+    --paper-checkbox-unchecked-color: var(--paper-green-900);
+    --paper-checkbox-unchecked-ink-color: var(--paper-green-900);
+    --paper-checkbox-label-color: var(--paper-green-500);
+    --paper-checkbox-label-spacing: 0;
+    --paper-checkbox-margin: 8px 16px 8px 0;
+    --paper-checkbox-vertical-align: top;
+  }
+
+  paper-checkbox .subtitle {
+    display: block;
+    font-size: 0.8em;
+    margin-top: 2px;
+    max-width: 150px;
+  }
+    </style>
+
+    <div class="card">
+        <iron-form id="myForm">
+            <form>
+      <div class="circle">4</div>
+      <h1>Fourth View</h1>
+      <div>
+      <paper-input always-float-label label="Floating label" required auto-validate error-message="needs some text!" value="[[username]]"></paper-input>
+            <paper-input label="username" auto-validate pattern="[a-zA-Z]*" error-message="letters only!" value="{{data.username}}">
+            <iron-icon icon="mail" slot="prefix"></iron-icon>
+            <div slot="suffix">@email.com</div>
+            </paper-input>
+      </div>
+    <div>
+        <paper-dropdown-menu label="Dinosaurs" value="{{data.dinosaur}}">
+        <paper-listbox slot="dropdown-content" >
+            <!--<paper-item value="allosaurus">allosaurus</paper-item>
+            <paper-item value="brontosaurus">brontosaurus</paper-item>
+            <paper-item value="carcharodontosaurus">carcharodontosaurus</paper-item>
+            <paper-item value="diplodocus">diplodocus</paper-item>-->
+            
+                <template is="dom-repeat" items="{{dinosaurs}}">
+                    <paper-item value="{{item}}">{{item}}</paper-item>
+                </template>
+           
+        </paper-listbox>
+        </paper-dropdown-menu>
+    </div>
+    <div>
+        <paper-checkbox checked>Checked</paper-checkbox>
+            <paper-checkbox class="styled" on-change="change" value="checked">
+            Checkbox
+            <span class="subtitle">
+                With a longer label
+            </span>
+            </paper-checkbox>
+            <paper-checkbox disabled>Disabled</paper-checkbox>
+    </div>
+    <div>
+        <paper-radio-group selected="{{data.radio}}" value="{{data.radio}}">
+  <paper-radio-button name="small">Small</paper-radio-button>
+  <paper-radio-button name="medium" pressed>Medium</paper-radio-button>
+  <paper-radio-button name="large">Large</paper-radio-button>
+</paper-radio-group>
+    </div>
+    
+    <div>
+        <paper-button class="pink">link</paper-button>
+<paper-button raised class="indigo">raised</paper-button>
+<paper-button toggles raised class="green" on-click="submitForm">toggles</paper-button>
+<paper-button disabled class="disabled">disabled</paper-button>
+    </div>
+            </form>
+        </iron-form>
+    </div>
+
+    <div>
+    
+    <iron-ajax id="ajax" method="post" url="https://jsonplaceholder.typicode.com/posts" handle-as="json" last-response="{{ajaxResponse}}" on-response="handleRequest"
+    on-response="handleResponse" on-error="handleError"></iron-ajax>
+    <paper-button on-click="getResult">Get Results</paper-button>
+    <h2>Ajax Results</h2>
+    <template is="dom-repeat" items="{{ajaxResponse.items}}">
+        <ul>
+          <li>[[item.snippet.title]]</li>
+        </ul>
+    </template>
+  
+    </div>
+  </template>
+
+  <script>
+    class SampleFourthView extends Polymer.Element {
+
+    
+      static get is() { return 'sample-fourth-view'; }
+
+      static get properties() {
+          return {
+              username : {
+                  type: String,
+                  value: ''
+              },
+               dinosaur : {
+                  type: String
+              },
+               radio : {
+                  type: Boolean,
+                  value: 'small'
+              },
+              checked : {
+                  type: Boolean,
+                  value: false
+              },
+              data: {
+                type: Object,
+                value: {
+                    
+                }
+              },
+              pressed: {
+                type: Boolean,
+                notify: true,
+                reflectToAttribute: true,
+                value: false
+             },
+            dinosaurs: {
+                type: Array,
+                value: ['allosaurus', 'brontosaurus', 'carcharodontosaurus', 'diplodocus']
+            },
+             ajaxResponse: {
+          type: String,
+          value: []
+        }
+          }
+      }
+
+      
+    //   ready() {
+    //     this.dinosaurs = [
+    //         'allosaurus', 'brontosaurus', 'carcharodontosaurus', 'diplodocus'
+    //     ];
+    //   }
+
+    getResult(e) {
+        console.log(this.data);
+        this.$.ajax.body=this.data;
+        this.$.ajax.generateRequest();
+    
+      }
+
+      change(e) {
+          this.data.checked = e.target.checked
+      }
+
+      submitForm(){
+          //document.getElementById('iron-form').submit();
+          if(this.$.myForm.validate()){
+                 console.log(this.data);
+          }
+      }
+    }
+
+    window.customElements.define(SampleFourthView.is, SampleFourthView);
+  </script>
+</dom-module>
